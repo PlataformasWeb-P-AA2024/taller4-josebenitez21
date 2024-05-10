@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width" />
+  <title>Demo jQuery - jQueryUI - CouchDB</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="estilos.css">
+  <style></style>
+</head>
+
+<body>
+
+  <h3>Informacion cantones</h3>
+  <div id="pestanias">
+    <ul>
+      <li><a href="t1">Principal</a></li>
+    </ul>
+    <div id="t1">
+      <p>Ingresa el nombre del cantón que desees buscar</p>
+      <input type="text" id="miInput" placeholder="Ingresa el Cantón aquí">
+      <button id="filterInstitution" type="submit">Obtener información de CouchDB </button>
+      <button id="allData" type="submit">Ver toda la información </button>
+      <button id="searchLimit" type="submit">Buscar por límite </button>
+      <p id="mensajeFinal"></p>
+    </div>
+  </div>
+</body>
+<script>
+  $(document).ready(function () {
+    var nombreCanton = $("#miInput").val().toUpperCase();
+    console.log(nombreCanton)
+    $("#pestanias").tabs();
+    $("#filterInstitution").click(function () {
+      $('#mensajeFinal').empty();
+
+      $.ajax({
+        dataType: 'json',
+        url: `http://127.0.0.1:5984/instituciones/_design/primero/_view/vista001?key="${nombreCanton}"&include_docs=true`
+      }).then(function (data) {
+        console.log(data);
+
+
+        $('#mensajeFinal').append(`<table> <tr> <th>AMIE</th> <th>INSTITUCIÓN</th> <th>Provincia</th> <th>Codigo Provincia</th></tr>`);
+        for (var index = 0; index < data.rows.length; index++) {
+          var institucion = data.rows[index].doc.Nombre_Institucion;
+          var amie = data.rows[index].doc.AMIE;
+          var provincia = data.rows[index].doc.Provincia
+          var cod_Provincia = data.rows[index].doc.Codigo_Provincia
+          $('#mensajeFinal').append(`<tr> <td>${amie}</td> <td>${institucion}</td> <td>${provincia}</td> <td>${cod_Provincia}</td>`)
+
+        }
+
+        $('#mensajeFinal').append("</table>")
+
+      });
+    });
+
+    
+    $("#allData").click(function () {
+      $('#mensajeFinal').empty();
+
+      $.ajax({
+        dataType: 'json',
+        url: `http://127.0.0.1:5984/instituciones/_design/primero/_view/vista001?&include_docs=true`
+      }).then(function (data) {
+        console.log(data);
+
+        $('#mensajeFinal').append(`<table> <tr> <th>AMIE</th> <th>INSTITUCIÓN</th> <th>Provincia</th> <th>Codigo Provincia</th></tr>`);
+        for (var index = 0; index < data.rows.length; index++) {
+          var institucion = data.rows[index].doc.Nombre_Institucion;
+          var amie = data.rows[index].doc.AMIE;
+          var provincia = data.rows[index].doc.Provincia
+          var cod_Provincia = data.rows[index].doc.Codigo_Provincia
+          $('#mensajeFinal').append(`<tr> <td>${amie}</td> <td>${institucion}</td> <td>${provincia}</td> <td>${cod_Provincia}</td>`)
+
+        }
+
+        $('#mensajeFinal').append("</table>")
+
+      });
+    });
+
+    $("#searchLimit").click(function () {
+      var limit = parseInt($("#miInput").val());
+      $('#mensajeFinal').empty();
+
+      $.ajax({
+        dataType: 'json',
+        url: `http://127.0.0.1:5984/instituciones/_design/primero/_view/vista001?limit=${limit}&include_docs=true`
+      }).then(function (data) {
+        console.log(data);
+        $('#mensajeFinal').append(`<table> <tr> <th>AMIE</th> <th>INSTITUCIÓN</th> <th>Provincia</th> <th>Codigo Provincia</th></tr>`);
+        for (var index = 0; index < data.rows.length; index++) {
+          var institucion = data.rows[index].doc.Nombre_Institucion;
+          var amie = data.rows[index].doc.AMIE;
+          var provincia = data.rows[index].doc.Provincia
+          var cod_Provincia = data.rows[index].doc.Codigo_Provincia
+          $('#mensajeFinal').append(`<tr> <td>${amie}</td> <td>${institucion}</td> <td>${provincia}</td> <td>${cod_Provincia}</td>`);
+        }
+        $('#mensajeFinal').append("</table>");
+      });
+    });
+
+    
+
+  });
+</script>
+
+</html>
